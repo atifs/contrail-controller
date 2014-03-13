@@ -114,8 +114,6 @@ static void WaitForIdle() {
     }    
 }
 
-uint64_t QueryEngine::anal_ttl = 0;
-
 static bool OptionsParse(Options &options, EventManager &evm,
                          int argc, char *argv[]) {
     try {
