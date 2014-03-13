@@ -2,6 +2,7 @@
 # Copyright (c) 2013 Juniper Networks, Inc. All rights reserved.
 #
 
+import resource
 import socket
 import fixtures
 import subprocess
@@ -78,7 +79,8 @@ class Collector(object):
         if self._is_dup is True:
             args.append('--DEFAULT.dup')
         self._instance = subprocess.Popen(args, stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE)
+                             stderr=subprocess.PIPE,
+                             preexec_fn = AnalyticsFixture.enable_core)
         self._logger.info('Setting up Vizd: %s' % (' '.join(args))) 
     # end start
 
@@ -212,8 +214,9 @@ class QueryEngine(object):
         if analytics_start_time is not None:
             args += ['--DEFAULT.start_time', str(analytics_start_time)]
         self._instance = subprocess.Popen(args,
-                                          stdout=subprocess.PIPE,
-                                          stderr=subprocess.PIPE)
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             preexec_fn = AnalyticsFixture.enable_core)
         self._logger.info('Setting up QueryEngine: %s' % ' '.join(args))
     # end start
 
@@ -446,6 +449,29 @@ class AnalyticsFixture(fixtures.Fixture):
             return False
         return True
 
+    @retry(delay=1, tries=6)
+    def verify_message_table_select_uint_type(self):
+        self.logger.info("verify_message_table_select_uint_type")
+        vns = VerificationOpsSrv('127.0.0.1', self.opserver_port)
+        # query for CollectorInfo logs
+        res = vns.post_query('MessageTable',
+                             start_time='-10m', end_time='now',
+                             select_fields=["Level", "Type", "MessageTS", "SequenceNum"],
+                             where_clause='')
+	if (res == []):
+            return False
+	else:
+	    for x in res:
+	        assert('Level' in x)
+		assert('Type' in x)
+		assert('MessageTS' in x)
+		assert('SequenceNum' in x)
+	    	assert(type(x['Level']) is int)
+	    	assert(type(x['Type']) is int)
+	    	assert(type(x['MessageTS']) is int)
+	    	assert(type(x['SequenceNum']) is int)
+	    return True
+    
     @retry(delay=1, tries=6)
     def verify_message_table_moduleid(self):
         self.logger.info("verify_message_table_moduleid")
@@ -1406,3 +1432,10 @@ class AnalyticsFixture(fixtures.Fixture):
         cport = cs.getsockname()[1]
         cs.close()
         return cport
+
+    @staticmethod
+    def enable_core():
+        try:
+	    resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
+        except:
+            pass

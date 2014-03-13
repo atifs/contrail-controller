@@ -219,7 +219,8 @@ main(int argc, char *argv[]) {
             options.redis_server(),
             options.redis_port(),
             options.max_tasks(),
-            options.max_slice());
+            options.max_slice(),
+            options.analytics_data_ttl());
     } else {
         qe = new QueryEngine(&evm,
             cassandra_ip,
@@ -228,6 +229,7 @@ main(int argc, char *argv[]) {
             options.redis_port(),
             options.max_tasks(),
             options.max_slice(),
+            options.analytics_data_ttl(),
             options.start_time());
     }
     (void) qe;
