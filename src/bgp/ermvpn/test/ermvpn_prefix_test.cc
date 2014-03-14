@@ -403,7 +403,8 @@ TEST_F(ErmVpnRouteTest, GlobalGetDBRequestKey) {
 }
 
 TEST_F(ErmVpnRouteTest, GlobalSetKey) {
-    ErmVpnRoute route(ErmVpnPrefix());
+    ErmVpnPrefix null_prefix;
+    ErmVpnRoute route(null_prefix);
     string prefix_str("2-10.1.1.1:65535-9.8.7.6,224.1.2.3,192.168.1.1");
     ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
     boost::scoped_ptr<ErmVpnTable::RequestKey> key(
