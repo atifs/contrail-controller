@@ -331,7 +331,7 @@ TEST_F(ErmVpnNativeTest, Hashing) {
 class ErmVpnLocalRouteTest : public ErmVpnTableTest {
 };
 
-TEST_F(ErmVpnLocalTest, AllocEntryStr) {
+TEST_F(ErmVpnLocalRouteTest, AllocEntryStr) {
     string prefix_str("1-10.1.1.1:65535-20.1.1.1,192.168.1.255,0.0.0.0");
     std::auto_ptr<DBEntry> route = blue_->AllocEntryStr(prefix_str);
     EXPECT_EQ(prefix_str, route->ToString());
@@ -637,7 +637,7 @@ TEST_F(ErmVpnLocalRouteTest, ReplicateRouteFromVPN4) {
 class ErmVpnGlobalRouteTest : public ErmVpnTableTest {
 };
 
-TEST_F(ErmVpnGlobalTest, AllocEntryStr) {
+TEST_F(ErmVpnGlobalRouteTest, AllocEntryStr) {
     string prefix_str("2-10.1.1.1:65535-20.1.1.1,192.168.1.255,0.0.0.0");
     std::auto_ptr<DBEntry> route = blue_->AllocEntryStr(prefix_str);
     EXPECT_EQ(prefix_str, route->ToString());
