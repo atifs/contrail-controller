@@ -8,6 +8,7 @@
 #include "base/task.h"
 #include "bgp/bgp_log.h"
 #include "bgp/bgp_server.h"
+#include "bgp/ermvpn/ermvpn_table.h"
 #include "control-node/control_node.h"
 #include "testing/gunit.h"
 
@@ -245,6 +246,16 @@ TEST_F(ErmVpnRouteTest, NativeIsValid4) {
     route.InsertPath(path);
     EXPECT_TRUE(route.IsValid());
     route.DeletePath(path);
+}
+
+TEST_F(ErmVpnRouteTest, NativeGetDBRequestKey) {
+    string prefix_str("0-10.1.1.1:65535-0.0.0.0,224.1.2.3,192.168.1.1");
+    ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
+    ErmVpnRoute route(prefix);
+    DBEntryBase::KeyPtr keyptr = route.GetDBRequestKey();
+    const ErmVpnTable::RequestKey *key =
+        static_cast<ErmVpnTable::RequestKey *>(keyptr.get());
+    EXPECT_EQ(prefix, key->prefix);
 }
 
 TEST_F(ErmVpnRouteTest, LocalToString) {
