@@ -248,6 +248,18 @@ TEST_F(ErmVpnRouteTest, NativeIsValid4) {
     route.DeletePath(path);
 }
 
+TEST_F(ErmVpnRouteTest, NativeSetKey) {
+    ErmVpnPrefix null_prefix;
+    ErmVpnRoute route(null_prefix);
+    string prefix_str("0-10.1.1.1:65535-0.0.0.0,224.1.2.3,192.168.1.1");
+    ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
+    boost::scoped_ptr<ErmVpnTable::RequestKey> key(
+        new ErmVpnTable::RequestKey(prefix, NULL));
+    route.SetKey(key.get());
+    EXPECT_EQ(prefix, key->prefix);
+    EXPECT_EQ(prefix, route.GetPrefix());
+}
+
 TEST_F(ErmVpnRouteTest, NativeGetDBRequestKey) {
     string prefix_str("0-10.1.1.1:65535-0.0.0.0,224.1.2.3,192.168.1.1");
     ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
@@ -318,6 +330,18 @@ TEST_F(ErmVpnRouteTest, LocalProtoPrefix) {
     EXPECT_EQ(22 * 8, proto_prefix.prefixlen);
     EXPECT_EQ(22, proto_prefix.prefix.size());
     EXPECT_EQ(prefix1, prefix2);
+}
+
+TEST_F(ErmVpnRouteTest, LocalSetKey) {
+    ErmVpnPrefix null_prefix;
+    ErmVpnRoute route(null_prefix);
+    string prefix_str("1-10.1.1.1:65535-9.8.7.6,224.1.2.3,192.168.1.1");
+    ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
+    boost::scoped_ptr<ErmVpnTable::RequestKey> key(
+        new ErmVpnTable::RequestKey(prefix, NULL));
+    route.SetKey(key.get());
+    EXPECT_EQ(prefix, key->prefix);
+    EXPECT_EQ(prefix, route.GetPrefix());
 }
 
 TEST_F(ErmVpnRouteTest, LocalGetDBRequestKey) {
@@ -392,16 +416,6 @@ TEST_F(ErmVpnRouteTest, GlobalProtoPrefix) {
     EXPECT_EQ(prefix1, prefix2);
 }
 
-TEST_F(ErmVpnRouteTest, GlobalGetDBRequestKey) {
-    string prefix_str("2-10.1.1.1:65535-9.8.7.6,224.1.2.3,192.168.1.1");
-    ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
-    ErmVpnRoute route(prefix);
-    DBEntryBase::KeyPtr keyptr = route.GetDBRequestKey();
-    const ErmVpnTable::RequestKey *key =
-        static_cast<ErmVpnTable::RequestKey *>(keyptr.get());
-    EXPECT_EQ(prefix, key->prefix);
-}
-
 TEST_F(ErmVpnRouteTest, GlobalSetKey) {
     ErmVpnPrefix null_prefix;
     ErmVpnRoute route(null_prefix);
@@ -412,6 +426,16 @@ TEST_F(ErmVpnRouteTest, GlobalSetKey) {
     route.SetKey(key.get());
     EXPECT_EQ(prefix, key->prefix);
     EXPECT_EQ(prefix, route.GetPrefix());
+}
+
+TEST_F(ErmVpnRouteTest, GlobalGetDBRequestKey) {
+    string prefix_str("2-10.1.1.1:65535-9.8.7.6,224.1.2.3,192.168.1.1");
+    ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));
+    ErmVpnRoute route(prefix);
+    DBEntryBase::KeyPtr keyptr = route.GetDBRequestKey();
+    const ErmVpnTable::RequestKey *key =
+        static_cast<ErmVpnTable::RequestKey *>(keyptr.get());
+    EXPECT_EQ(prefix, key->prefix);
 }
 
 int main(int argc, char **argv) {
