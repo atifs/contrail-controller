@@ -144,7 +144,7 @@ TEST_F(ErmVpnPrefixTest, Error4) {
 // No "," to delineate the router-id.
 TEST_F(ErmVpnPrefixTest, Error5) {
     boost::system::error_code ec;
-    string prefix_str("2-10.1.1.1:65535-9.8.7.6:224.1.2.3,192.168.1.1");
+    string prefix_str("2-10.1.1.1:65535-9.8.7.6:224.1.2.3:192.168.1.1");
     ErmVpnPrefix prefix = ErmVpnPrefix::FromString(prefix_str, &ec);
     EXPECT_NE(0, ec.value());
     EXPECT_EQ(ErmVpnPrefix::Invalid, prefix.type());

@@ -108,10 +108,6 @@ bool McastForwarder::Update(ErmVpnRoute *route) {
         encap_ = forwarder.encap_;
         changed = true;
     }
-    if (router_id_ != forwarder.router_id_) {
-        router_id_ = forwarder.router_id_;
-        changed = true;
-    }
 
     return changed;
 }
