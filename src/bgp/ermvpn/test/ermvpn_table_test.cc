@@ -178,6 +178,12 @@ protected:
 class ErmVpnNativeTest : public ErmVpnTableTest {
 };
 
+TEST_F(ErmVpnNativeTest, AllocEntryStr) {
+    string prefix_str("0-10.1.1.1:65535-0.0.0.0,224.1.2.3,192.168.1.1");
+    std::auto_ptr<DBEntry> route = blue_->AllocEntryStr(prefix_str);
+    EXPECT_EQ(prefix_str, route->ToString());
+}
+
 TEST_F(ErmVpnNativeTest, AddDeleteSingleRoute) {
     ostringstream repr;
     repr << "0-10.1.1.1:65535-0.0.0.0,192.168.1.255,0.0.0.0";
@@ -324,6 +330,12 @@ TEST_F(ErmVpnNativeTest, Hashing) {
 
 class ErmVpnLocalRouteTest : public ErmVpnTableTest {
 };
+
+TEST_F(ErmVpnLocalTest, AllocEntryStr) {
+    string prefix_str("1-10.1.1.1:65535-20.1.1.1,192.168.1.255,0.0.0.0");
+    std::auto_ptr<DBEntry> route = blue_->AllocEntryStr(prefix_str);
+    EXPECT_EQ(prefix_str, route->ToString());
+}
 
 TEST_F(ErmVpnLocalRouteTest, AddDeleteSingleRoute) {
     ostringstream repr;
@@ -624,6 +636,12 @@ TEST_F(ErmVpnLocalRouteTest, ReplicateRouteFromVPN4) {
 
 class ErmVpnGlobalRouteTest : public ErmVpnTableTest {
 };
+
+TEST_F(ErmVpnGlobalTest, AllocEntryStr) {
+    string prefix_str("2-10.1.1.1:65535-20.1.1.1,192.168.1.255,0.0.0.0");
+    std::auto_ptr<DBEntry> route = blue_->AllocEntryStr(prefix_str);
+    EXPECT_EQ(prefix_str, route->ToString());
+}
 
 TEST_F(ErmVpnGlobalRouteTest, AddDeleteSingleRoute) {
     ostringstream repr;
