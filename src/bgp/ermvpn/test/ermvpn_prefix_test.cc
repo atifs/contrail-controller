@@ -198,6 +198,12 @@ protected:
     BgpAttrDB *attr_db_;
 };
 
+TEST_F(ErmVpnRouteTest, InvalidRouteType) {
+    ErmVpnPrefix prefix;
+    ErmVpnRoute route(prefix);
+    EXPECT_FALSE(route.IsValid());
+}
+
 TEST_F(ErmVpnRouteTest, NativeToString) {
     string prefix_str("0-10.1.1.1:65535-0.0.0.0,224.1.2.3,192.168.1.1");
     ErmVpnPrefix prefix(ErmVpnPrefix::FromString(prefix_str));

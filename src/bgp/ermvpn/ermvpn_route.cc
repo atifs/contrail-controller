@@ -255,11 +255,9 @@ bool ErmVpnRoute::IsValid() const {
         return attr->edge_forwarding();
         break;
     default:
-        assert(false);
         break;
     }
 
-    assert(false);
     return false;
 }
 
