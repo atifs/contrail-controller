@@ -1280,6 +1280,7 @@ TEST_F(BgpXmppMcast2ServerTest, RouterIdChange) {
 
     // Update the RouterIDs of all bgp servers.
     Configure(config_tmpl2_new);
+    usleep(30 * 1000000);
 
     // Delete mcast route for all agents.
     agent_ya_->DeleteMcastRoute("blue", mroute);
