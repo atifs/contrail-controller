@@ -194,9 +194,7 @@ void ErmVpnTable::CreateTreeManager() {
 }
 
 void ErmVpnTable::DestroyTreeManager() {
-    // There's no McastTreeManager for the VPN table.
-    if (IsDefault())
-        return;
+    assert(tree_manager_);
     tree_manager_->Terminate();
     delete tree_manager_;
     tree_manager_ = NULL;
