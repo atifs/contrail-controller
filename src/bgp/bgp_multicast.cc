@@ -897,17 +897,18 @@ void McastTreeManager::TreeResultListener(McastManagerPartition *partition,
         ErmVpnRoute *route) {
     CHECK_CONCURRENCY("db::DBTable");
 
-    // Ignore the GlobalTreeRoute if it's not applicable to this control-node.
-    BgpServer *server = table_->routing_instance()->server();
-    if (route->GetPrefix().router_id().to_ulong() != server->bgp_identifier())
-        return;
-
     DBState *dbstate = route->GetState(table_, listener_id_);
     if (!dbstate) {
 
         // We have no previous DBState for this route.
         // Bail if the route is not valid.
         if (!route->IsValid())
+            return;
+
+        // Ignore GlobalTreeRoute if it's not applicable to this control-node.
+        BgpServer *server = table_->routing_instance()->server();
+        if (route->GetPrefix().router_id().to_ulong() !=
+            server->bgp_identifier())
             return;
 
         McastSGEntry *sg_entry = partition->LocateSGEntry(
