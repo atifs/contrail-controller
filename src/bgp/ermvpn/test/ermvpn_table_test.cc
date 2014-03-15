@@ -175,6 +175,11 @@ protected:
     tbb::atomic<long> del_notification_;
 };
 
+TEST_F(ErmVpnTableTest, TreeManager) {
+    TASK_UTIL_EXPECT_TRUE(master_->GetTreeManager() == NULL);
+    TASK_UTIL_EXPECT_TRUE(blue_->GetTreeManager() != NULL);
+}
+
 class ErmVpnTableNativeTest : public ErmVpnTableTest {
 };
 
