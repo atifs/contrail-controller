@@ -52,10 +52,10 @@ class StateMachineTest : public StateMachine {
                 boost::bind(&StateMachine::TimerErrorHanlder, this, _1, _2));
         }
 
-        virtual int hold_time_msecs() const { return hold_time_msec_ /* msec */; }
+        virtual int hold_time_msecs() const { return hold_time_msec_ ; }
 };
 
-bool StateMachineTest::hold_time_msec_ = StateMachine::GetDefaultHoldTime() * 1000;
+bool StateMachineTest::hold_time_msec_ = StateMachine::kHoldTime * 1000;
 
 class BgpServerUnitTest : public ::testing::Test {
 protected:
