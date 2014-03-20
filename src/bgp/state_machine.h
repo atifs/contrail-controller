@@ -80,7 +80,7 @@ public:
     static const int kMaxIdleHoldTime = 100 * 1000; // milliseconds
     static const int kJitter = 10;                  // percentage
 
-    static const int GetDefaultHoldTime();
+    const int GetDefaultHoldTime();
 
     enum State {
         IDLE        = 0,
