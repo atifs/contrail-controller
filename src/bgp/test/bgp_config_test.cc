@@ -139,21 +139,25 @@ TEST_F(BgpConfigTest, BgpRouterHoldTimeChange) {
     const StateMachine *state_machine = GetPeerStateMachine(peer);
 
     // Hold time should be 90 since it's not specified explicitly.
+    TASK_UTIL_EXPECT_EQ(0, server_.hold_time());
     TASK_UTIL_EXPECT_EQ(90, state_machine->GetConfiguredHoldTime());
 
     // Hold time should change to 9.
     string content_b = FileRead("controller/src/bgp/testdata/config_test_23b.xml");
     EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_EQ(9, server_.hold_time());
     TASK_UTIL_EXPECT_EQ(9, state_machine->GetConfiguredHoldTime());
 
     // Hold time should change to 27.
     string content_c = FileRead("controller/src/bgp/testdata/config_test_23c.xml");
     EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_EQ(27, server_.hold_time());
     TASK_UTIL_EXPECT_EQ(27, state_machine->GetConfiguredHoldTime());
 
     // Hold time should go back to 90 since it's not specified explicitly.
     content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_EQ(0, server_.hold_time());
     TASK_UTIL_EXPECT_EQ(90, state_machine->GetConfiguredHoldTime());
 
     boost::replace_all(content_a, "<config>", "<delete>");
