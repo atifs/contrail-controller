@@ -123,7 +123,7 @@ TEST_F(BgpConfigManagerTest, HoldTimeChange) {
     string content_b = FileRead("controller/src/bgp/testdata/config_test_23b.xml");
     EXPECT_TRUE(parser_.Parse(content_b));
     TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
-    TASK_UTIL_EXPECT_EQ(3, protocol_cfg->router_params().hold_time);
+    TASK_UTIL_EXPECT_EQ(9, protocol_cfg->router_params().hold_time);
 
     // Hold time should change to 27.
     string content_c = FileRead("controller/src/bgp/testdata/config_test_23c.xml");
