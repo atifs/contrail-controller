@@ -123,13 +123,13 @@ TEST_F(BgpConfigManagerTest, IdentifierChange) {
     string content_b = FileRead("controller/src/bgp/testdata/config_test_25b.xml");
     EXPECT_TRUE(parser_.Parse(content_b));
     TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
-    TASK_UTIL_EXPECT_EQ(9, protocol_cfg->router_params().identifier);
+    TASK_UTIL_EXPECT_EQ("10.1.1.1", protocol_cfg->router_params().identifier);
 
     // Identifier should change to 20.1.1.1.
     string content_c = FileRead("controller/src/bgp/testdata/config_test_25c.xml");
     EXPECT_TRUE(parser_.Parse(content_c));
     TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
-    TASK_UTIL_EXPECT_EQ(27, protocol_cfg->router_params().identifier);
+    TASK_UTIL_EXPECT_EQ("20.1.1.1", protocol_cfg->router_params().identifier);
 
     // Identifier should go back to address since it's not specified explicitly.
     content_a = FileRead("controller/src/bgp/testdata/config_test_25a.xml");
