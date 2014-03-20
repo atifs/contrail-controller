@@ -136,7 +136,7 @@ TEST_F(BgpConfigManagerTest, HoldTimeChange) {
 
     boost::replace_all(content_a, "<config>", "<delete>");
     boost::replace_all(content_a, "</config>", "</delete>");
-    EXPECT_TRUE(parser_.Parse(content));
+    EXPECT_TRUE(parser_.Parse(content_a));
     task_util::WaitForIdle();
 
     TASK_UTIL_EXPECT_EQ(1, config_manager_->config().instances().size());
