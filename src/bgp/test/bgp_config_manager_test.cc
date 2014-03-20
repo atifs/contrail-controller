@@ -122,16 +122,19 @@ TEST_F(BgpConfigManagerTest, HoldTimeChange) {
     // Hold time should change to 9.
     string content_b = FileRead("controller/src/bgp/testdata/config_test_23b.xml");
     EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
     TASK_UTIL_EXPECT_EQ(3, protocol_cfg->router_params().hold_time);
 
     // Hold time should change to 27.
     string content_c = FileRead("controller/src/bgp/testdata/config_test_23c.xml");
     EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
     TASK_UTIL_EXPECT_EQ(27, protocol_cfg->router_params().hold_time);
 
     // Hold time should go back to 0 since it's not specified explicitly.
     content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
     TASK_UTIL_EXPECT_EQ(0, protocol_cfg->router_params().hold_time);
 
     boost::replace_all(content_a, "<config>", "<delete>");
