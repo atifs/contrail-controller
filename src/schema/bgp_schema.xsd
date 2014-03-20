@@ -33,10 +33,10 @@
 <!-- #IFMAP-SEMANTICS-IDL
      Property('bgp-router-parameters', 'bgp-router') -->
 
-<xsd:simpleType name="BgpHoldTime">
+<xsd:simpleType name='BgpHoldTime'>
      <xsd:restriction base='xsd:integer'>
          <xsd:minInclusive value='1'/>
-         <xsd:maxInclusive value='65535"/>
+         <xsd:maxInclusive value='65535'/>
      </xsd:restriction>
 </xsd:simpleType> 
 
