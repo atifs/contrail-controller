@@ -1607,7 +1607,7 @@ const std::string StateMachine::last_notification_out_error() const {
 //
 // Get the default hold time in seconds
 //
-const int StateMachine::GetDefaultHoldTime() {
+int StateMachine::GetDefaultHoldTime() {
     static bool env_checked = false;
     static int env_hold_time = 0;
 

@@ -80,8 +80,6 @@ public:
     static const int kMaxIdleHoldTime = 100 * 1000; // milliseconds
     static const int kJitter = 10;                  // percentage
 
-    const int GetDefaultHoldTime();
-
     enum State {
         IDLE        = 0,
         ACTIVE      = 1,
@@ -112,6 +110,7 @@ public:
     void CancelOpenTimer();
     bool OpenTimerRunning();
 
+    int GetDefaultHoldTime();
     virtual void StartHoldTimer();
     void CancelHoldTimer();
     bool HoldTimerRunning();
