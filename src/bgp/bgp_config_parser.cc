@@ -298,6 +298,8 @@ static bool ParseBgpRouter(const string &instance, const xml_node &node,
     }
     if (property->autonomous_system == 0)
         property->autonomous_system = BgpConfigManager::kDefaultAutonomousSystem;
+    if (property->identifier.empty())
+        property->identifier = property->address;
 
     if (name) {
         identifier = name.value();

@@ -99,6 +99,53 @@ protected:
     BgpConfigParser parser_;
 };
 
+TEST_F(BgpConfigManagerTest, IdentifierChange) {
+    string content_a = FileRead("controller/src/bgp/testdata/config_test_25a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    const BgpConfigData::BgpInstanceMap &instances =
+        config_manager_->config().instances();
+    TASK_UTIL_ASSERT_TRUE(instances.end() !=
+                          instances.find(BgpConfigManager::kMasterInstance));
+    BgpConfigData::BgpInstanceMap::const_iterator loc =
+        instances.find(BgpConfigManager::kMasterInstance);
+    const BgpInstanceConfig *instance_cfg = loc->second;
+    TASK_UTIL_ASSERT_TRUE(instance_cfg != NULL);
+    const BgpProtocolConfig *protocol_cfg = instance_cfg->protocol_config();
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg != NULL);
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg->bgp_router() != NULL);
+
+    // Identifier should be address since it's not specified explicitly.
+    TASK_UTIL_EXPECT_EQ("127.0.0.1", protocol_cfg->router_params().identifier);
+
+    // Identifier should change to 10.1.1.1.
+    string content_b = FileRead("controller/src/bgp/testdata/config_test_25b.xml");
+    EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ(9, protocol_cfg->router_params().identifier);
+
+    // Identifier should change to 20.1.1.1.
+    string content_c = FileRead("controller/src/bgp/testdata/config_test_25c.xml");
+    EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ(27, protocol_cfg->router_params().identifier);
+
+    // Identifier should go back to address since it's not specified explicitly.
+    content_a = FileRead("controller/src/bgp/testdata/config_test_25a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ("127.0.0.1", protocol_cfg->router_params().identifier);
+
+    boost::replace_all(content_a, "<config>", "<delete>");
+    boost::replace_all(content_a, "</config>", "</delete>");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    TASK_UTIL_EXPECT_EQ(1, config_manager_->config().instances().size());
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
+}
+
 TEST_F(BgpConfigManagerTest, AutonomousSystemChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
