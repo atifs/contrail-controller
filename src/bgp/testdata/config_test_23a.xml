@@ -5,5 +5,9 @@
           <address>127.0.0.1</address>
           <autonomous-system>1</autonomous-system>
       </bgp-router>
+      <bgp-router name='remote'>
+          <address>127.0.0.100</address>
+          <autonomous-system>1</autonomous-system>
+      </bgp-router>
     </routing-instance>
 </config>
