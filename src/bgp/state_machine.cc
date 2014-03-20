@@ -29,13 +29,13 @@ using namespace std;
 namespace mpl = boost::mpl;
 namespace sc = boost::statechart;
 
-static const int StateMachine::kOpenTime = 15;                // seconds
-static const int StateMachine::kConnectInterval = 30;         // seconds
-static const int StateMachine::kHoldTime = 90;                // seconds
-static const int StateMachine::kOpenSentHoldTime = 240;       // seconds
-static const int StateMachine::kIdleHoldTime = 5000;          // milliseconds
-static const int StateMachine::kMaxIdleHoldTime = 100 * 1000; // milliseconds
-static const int StateMachine::kJitter = 10;                  // percentage
+const int StateMachine::kOpenTime = 15;                // seconds
+const int StateMachine::kConnectInterval = 30;         // seconds
+const int StateMachine::kHoldTime = 90;                // seconds
+const int StateMachine::kOpenSentHoldTime = 240;       // seconds
+const int StateMachine::kIdleHoldTime = 5000;          // milliseconds
+const int StateMachine::kMaxIdleHoldTime = 100 * 1000; // milliseconds
+const int StateMachine::kJitter = 10;                  // percentage
 
 #define SM_LOG(level, _Msg)                                    \
     do {                                                       \
@@ -1517,8 +1517,6 @@ ostream &operator<<(ostream &out, const StateMachine::State &state) {
     out << state_names[state];
     return out;
 }
-
-const int StateMachine::kConnectInterval;
 
 // This class determines whether a given class has a method called 'validate'.
 template <typename Ev>
