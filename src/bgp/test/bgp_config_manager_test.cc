@@ -99,6 +99,55 @@ protected:
     BgpConfigParser parser_;
 };
 
+TEST_F(BgpConfigManagerTest, AutonomousSystemChange) {
+    string content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    const BgpConfigData::BgpInstanceMap &instances =
+        config_manager_->config().instances();
+    TASK_UTIL_ASSERT_TRUE(instances.end() !=
+                          instances.find(BgpConfigManager::kMasterInstance));
+    BgpConfigData::BgpInstanceMap::const_iterator loc =
+        instances.find(BgpConfigManager::kMasterInstance);
+    const BgpInstanceConfig *instance_cfg = loc->second;
+    TASK_UTIL_ASSERT_TRUE(instance_cfg != NULL);
+    const BgpProtocolConfig *protocol_cfg = instance_cfg->protocol_config();
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg != NULL);
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg->bgp_router() != NULL);
+
+    // AS should be kDefaultAutonomousSystem as it's not specified.
+    TASK_UTIL_EXPECT_EQ(BgpConfigManager::kDefaultAutonomousSystem,
+        protocol_cfg->router_params().autonomous_system);
+
+    // AS time should change to 100.
+    string content_b = FileRead("controller/src/bgp/testdata/config_test_24b.xml");
+    EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ(100, protocol_cfg->router_params().autonomous_system);
+
+    // AS time should change to 101.
+    string content_c = FileRead("controller/src/bgp/testdata/config_test_24c.xml");
+    EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ(101, protocol_cfg->router_params().autonomous_system);
+
+    // AS should go back to kDefaultAutonomousSystem as it's not specified.
+    content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_TRUE(protocol_cfg->bgp_router() != NULL);
+    TASK_UTIL_EXPECT_EQ(BgpConfigManager::kDefaultAutonomousSystem,
+        protocol_cfg->router_params().autonomous_system);
+
+    boost::replace_all(content_a, "<config>", "<delete>");
+    boost::replace_all(content_a, "</config>", "</delete>");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    TASK_UTIL_EXPECT_EQ(1, config_manager_->config().instances().size());
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
+}
+
 TEST_F(BgpConfigManagerTest, HoldTimeChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
