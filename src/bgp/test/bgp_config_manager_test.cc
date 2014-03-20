@@ -99,12 +99,49 @@ protected:
     BgpConfigParser parser_;
 };
 
-//
-// Config parsing tests
-//
-// TODO:
-// Invalid config files.
-// Instance delete order.
+TEST_F(BgpConfigManagerTest, HoldTimeChange) {
+    string content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    const BgpConfigData::BgpInstanceMap &instances =
+        config_manager_->config().instances();
+    TASK_UTIL_ASSERT_TRUE(instances.end() !=
+                          instances.find(BgpConfigManager::kMasterInstance));
+    BgpConfigData::BgpInstanceMap::const_iterator loc =
+        instances.find(BgpConfigManager::kMasterInstance);
+    const BgpInstanceConfig *instance_cfg = loc->second;
+    TASK_UTIL_ASSERT_TRUE(instance_cfg != NULL);
+    const BgpProtocolConfig *protocol_cfg = instance_cfg->protocol_config();
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg != NULL);
+    TASK_UTIL_ASSERT_TRUE(protocol_cfg->bgp_router() != NULL);
+
+    // Hold time should be 0 since it's not specified explicitly.
+    TASK_UTIL_EXPECT_EQ(0, protocol_cfg->router_params().hold_time);
+
+    // Hold time should change to 9.
+    string content_b = FileRead("controller/src/bgp/testdata/config_test_23b.xml");
+    EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_EQ(3, protocol_cfg->router_params().hold_time);
+
+    // Hold time should change to 27.
+    string content_c = FileRead("controller/src/bgp/testdata/config_test_23c.xml");
+    EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_EQ(27, protocol_cfg->router_params().hold_time);
+
+    // Hold time should go back to 0 since it's not specified explicitly.
+    content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_EQ(0, protocol_cfg->router_params().hold_time);
+
+    boost::replace_all(content_a, "<config>", "<delete>");
+    boost::replace_all(content_a, "</config>", "</delete>");
+    EXPECT_TRUE(parser_.Parse(content));
+    task_util::WaitForIdle();
+
+    TASK_UTIL_EXPECT_EQ(1, config_manager_->config().instances().size());
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
+}
 
 TEST_F(BgpConfigManagerTest, MasterNeighbors) {
     string content = FileRead("controller/src/bgp/testdata/config_test_1.xml");

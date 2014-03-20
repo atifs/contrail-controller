@@ -84,6 +84,7 @@ public:
     const std::string &localname() const;
     as_t autonomous_system() const { return autonomous_system_; }
     uint32_t bgp_identifier() const { return bgp_identifier_.to_ulong(); };
+    uint16_t hold_time() const { return hold_time_; }
 
     // Status
     uint32_t num_routing_instance() const;
@@ -117,6 +118,7 @@ private:
     // base config variables
     as_t autonomous_system_;
     Ip4Address bgp_identifier_;
+    uint16_t hold_time_;
 
     DB db_;
     boost::dynamic_bitset<> peer_bmap_;
