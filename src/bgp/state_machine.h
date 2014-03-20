@@ -110,7 +110,7 @@ public:
     void CancelOpenTimer();
     bool OpenTimerRunning();
 
-    int GetDefaultHoldTime();
+    int GetConfiguredHoldTime();
     virtual void StartHoldTimer();
     void CancelHoldTimer();
     bool HoldTimerRunning();

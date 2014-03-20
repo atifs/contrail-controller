@@ -518,7 +518,7 @@ struct Active : sc::state<Active, StateMachine> {
             return discard_event();
 
         // Send OPEN and go to OpenConfirm.
-        int local_holdtime = state_machine->GetDefaultHoldTime();
+        int local_holdtime = state_machine->GetConfiguredHoldTime();
         state_machine->set_hold_time(min(event.msg->holdtime, local_holdtime));
         state_machine->AssignSession(false);
         peer->SendOpen(session);
@@ -653,7 +653,7 @@ struct Connect : sc::state<Connect, StateMachine> {
 
         // Send OPEN and go to OpenConfirm.  Since we've decided to use the
         // passive session, we get rid of the active one.
-        int local_holdtime = state_machine->GetDefaultHoldTime();
+        int local_holdtime = state_machine->GetConfiguredHoldTime();
         state_machine->set_hold_time(min(event.msg->holdtime, local_holdtime));
         state_machine->set_active_session(NULL);
         state_machine->AssignSession(false);
@@ -852,7 +852,7 @@ struct OpenSent : sc::state<OpenSent, StateMachine> {
             }
         }
 
-        int local_holdtime = state_machine->GetDefaultHoldTime();
+        int local_holdtime = state_machine->GetConfiguredHoldTime();
         state_machine->set_hold_time(min(event.msg->holdtime, local_holdtime));
         peer->SetCapabilities(event.msg.get());
         return transit<OpenConfirm>();
@@ -1053,7 +1053,7 @@ StateMachine::StateMachine(BgpPeer *peer)
             "Idle hold timer",
             TaskScheduler::GetInstance()->GetTaskId("bgp::StateMachine"),
             peer->GetIndex())),
-        hold_time_(GetDefaultHoldTime()),
+        hold_time_(GetConfiguredHoldTime()),
         idle_hold_time_(0),
         attempts_(0),
         deleted_(false),
@@ -1611,9 +1611,9 @@ const std::string StateMachine::last_notification_out_error() const {
 }
 
 //
-// Get the default hold time in seconds
+// Return the configured hold time in seconds.
 //
-int StateMachine::GetDefaultHoldTime() {
+int StateMachine::GetConfiguredHoldTime() {
     static bool env_checked = false;
     static int env_hold_time = 0;
 
@@ -1625,6 +1625,8 @@ int StateMachine::GetDefaultHoldTime() {
             env_hold_time = strtoul(keepalive_time_str, NULL, 0) * 3;
             return env_hold_time;
         }
+    } else if (env_hold_time) {
+        return env_hold_time;
     }
 
     // Use the configured hold-time if available.
@@ -1704,7 +1706,7 @@ void StateMachine::set_hold_time(int hold_time) {
 }
 
 void StateMachine::reset_hold_time() { 
-    hold_time_ = GetDefaultHoldTime(); 
+    hold_time_ = GetConfiguredHoldTime();
 
     BgpPeerInfoData peer_info;
     peer_info.set_name(peer()->ToUVEKey());
