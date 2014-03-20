@@ -296,6 +296,9 @@ static bool ParseBgpRouter(const string &instance, const xml_node &node,
         // TODO: log warning
         return false;
     }
+    if (property->autonomous_system == 0)
+        property->autonomous_system = BgpConfigManager::kDefaultAutonomousSystem;
+
     if (name) {
         identifier = name.value();
     } else if (!property->address.empty()) {
