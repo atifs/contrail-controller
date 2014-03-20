@@ -29,6 +29,14 @@ using namespace std;
 namespace mpl = boost::mpl;
 namespace sc = boost::statechart;
 
+static const int StateMachine::kOpenTime = 15;                // seconds
+static const int StateMachine::kConnectInterval = 30;         // seconds
+static const int StateMachine::kHoldTime = 90;                // seconds
+static const int StateMachine::kOpenSentHoldTime = 240;       // seconds
+static const int StateMachine::kIdleHoldTime = 5000;          // milliseconds
+static const int StateMachine::kMaxIdleHoldTime = 100 * 1000; // milliseconds
+static const int StateMachine::kJitter = 10;                  // percentage
+
 #define SM_LOG(level, _Msg)                                    \
     do {                                                       \
         std::ostringstream out;                                \

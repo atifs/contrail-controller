@@ -27,7 +27,7 @@ using namespace std;
 //
 class StateMachineTest : public StateMachine {
     public:
-        static bool hold_time_msec_;
+        static int hold_time_msec_;
         explicit StateMachineTest(BgpPeer *peer) : StateMachine(peer) { }
         ~StateMachineTest() { }
 
@@ -55,7 +55,7 @@ class StateMachineTest : public StateMachine {
         virtual int hold_time_msecs() const { return hold_time_msec_ ; }
 };
 
-bool StateMachineTest::hold_time_msec_ = StateMachine::kHoldTime * 1000;
+int StateMachineTest::hold_time_msec_ = StateMachine::kHoldTime * 1000;
 
 class BgpServerUnitTest : public ::testing::Test {
 protected:
