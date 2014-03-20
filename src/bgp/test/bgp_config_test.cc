@@ -122,6 +122,40 @@ TEST_F(BgpConfigTest, MasterNeighbors) {
     TASK_UTIL_EXPECT_EQ(2, rti->peer_manager()->size());
 }
 
+TEST_F(BgpConfigTest, BgpRouterAutonomousSystemChange) {
+    string content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    // AS should be kDefaultAutonomousSystem as it's not specified.
+    TASK_UTIL_EXPECT_EQ(BgpConfigManager::kDefaultAutonomousSystem,
+        server_.autonomous_system());
+
+    // AS should change to 100.
+    string content_b = FileRead("controller/src/bgp/testdata/config_test_24b.xml");
+    EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_EQ(100, server_.autonomous_system());
+
+    // AS should change to 101.
+    string content_c = FileRead("controller/src/bgp/testdata/config_test_24c.xml");
+    EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_EQ(101, server_.autonomous_system());
+
+    // AS should go back to kDefaultAutonomousSystem since it's not specified.
+    content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_EQ(BgpConfigManager::kDefaultAutonomousSystem,
+        server_.autonomous_system());
+
+    boost::replace_all(content_a, "<config>", "<delete>");
+    boost::replace_all(content_a, "</config>", "</delete>");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.edge_count());
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
+}
+
 TEST_F(BgpConfigTest, BgpRouterHoldTimeChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
