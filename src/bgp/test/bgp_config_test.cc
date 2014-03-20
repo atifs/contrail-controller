@@ -13,6 +13,7 @@
 #include "bgp/bgp_config_parser.h"
 #include "bgp/bgp_log.h"
 #include "bgp/bgp_server.h"
+#include "bgp/state_machine.h"
 #include "bgp/inet/inet_table.h"
 #include "bgp/routing-instance/peer_manager.h"
 #include "bgp/routing-instance/routing_instance.h"
@@ -60,6 +61,10 @@ protected:
         TASK_UTIL_ASSERT_EQ(static_cast<BgpSessionManager *>(NULL),
                             server_.session_manager());
         db_util::Clear(&config_db_);
+    }
+
+    const StateMachine *GetPeerStateMachine(BgpPeer *peer) {
+        return peer->state_machine();
     }
 
     EventManager evm_;
@@ -115,6 +120,49 @@ TEST_F(BgpConfigTest, MasterNeighbors) {
     EXPECT_TRUE(parser_.Parse(config_delete));
     task_util::WaitForIdle();
     TASK_UTIL_EXPECT_EQ(2, rti->peer_manager()->size());
+}
+
+TEST_F(BgpConfigTest, BgpRouterHoldTimeChange) {
+    string content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    RoutingInstance *rti = server_.routing_instance_mgr()->GetRoutingInstance(
+        BgpConfigManager::kMasterInstance);
+    TASK_UTIL_ASSERT_TRUE(rti != NULL);
+    TASK_UTIL_EXPECT_EQ(1, rti->peer_manager()->size());
+    string name = rti->name() + ":" + "remote";
+
+    BgpPeer *peer;
+    TASK_UTIL_EXPECT_TRUE(rti->peer_manager()->PeerLookup(name) != NULL);
+    peer = rti->peer_manager()->PeerLookup(name);
+    const StateMachine *state_machine = GetPeerStateMachine(peer);
+
+    // Hold time should be 90 since it's not specified explicitly.
+    TASK_UTIL_EXPECT_EQ(90, state_machine->GetConfiguredHoldTime());
+
+    // Hold time should change to 9.
+    string content_b = FileRead("controller/src/bgp/testdata/config_test_23b.xml");
+    EXPECT_TRUE(parser_.Parse(content_b));
+    TASK_UTIL_EXPECT_EQ(9, state_machine->GetConfiguredHoldTime());
+
+    // Hold time should change to 27.
+    string content_c = FileRead("controller/src/bgp/testdata/config_test_23c.xml");
+    EXPECT_TRUE(parser_.Parse(content_c));
+    TASK_UTIL_EXPECT_EQ(27, state_machine->GetConfiguredHoldTime());
+
+    // Hold time should go back to 90 since it's not specified explicitly.
+    content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    TASK_UTIL_EXPECT_EQ(90, state_machine->GetConfiguredHoldTime());
+
+    boost::replace_all(content_a, "<config>", "<delete>");
+    boost::replace_all(content_a, "</config>", "</delete>");
+    EXPECT_TRUE(parser_.Parse(content_a));
+    task_util::WaitForIdle();
+
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.edge_count());
+    TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
 }
 
 //

@@ -193,6 +193,7 @@ public:
     bool IsControlNode() const { return control_node_; }
 
 private:
+    friend class BgpConfigTest;
     friend class BgpPeerTest;
     friend class StateMachineTest;
 

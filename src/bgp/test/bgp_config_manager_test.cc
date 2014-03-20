@@ -99,7 +99,7 @@ protected:
     BgpConfigParser parser_;
 };
 
-TEST_F(BgpConfigManagerTest, IdentifierChange) {
+TEST_F(BgpConfigManagerTest, BgpRouterIdentifierChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_25a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
     task_util::WaitForIdle();
@@ -146,7 +146,7 @@ TEST_F(BgpConfigManagerTest, IdentifierChange) {
     TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
 }
 
-TEST_F(BgpConfigManagerTest, AutonomousSystemChange) {
+TEST_F(BgpConfigManagerTest, BgpRouterAutonomousSystemChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_24a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
     task_util::WaitForIdle();
@@ -195,7 +195,7 @@ TEST_F(BgpConfigManagerTest, AutonomousSystemChange) {
     TASK_UTIL_EXPECT_EQ(0, db_graph_.vertex_count());
 }
 
-TEST_F(BgpConfigManagerTest, HoldTimeChange) {
+TEST_F(BgpConfigManagerTest, BgpRouterHoldTimeChange) {
     string content_a = FileRead("controller/src/bgp/testdata/config_test_23a.xml");
     EXPECT_TRUE(parser_.Parse(content_a));
     task_util::WaitForIdle();
